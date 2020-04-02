@@ -13,6 +13,7 @@ export class PathfindingVisualizer extends Component {
         super(props);
         this.state = {
             grid: [],
+            mouseIsPressed: false,
         };
     }
 
@@ -21,6 +22,21 @@ export class PathfindingVisualizer extends Component {
         this.setState({grid});
     }
 
+    handleMouseDown(row, col) {
+        const newGrid = getGridWithWall(this.state.grid, row, col);
+        this.setState({grid: newGrid, mouseIsPressed: true});
+    }
+    
+    handleMouseEnter(row, col) {
+        if (!this.state.mouseIsPressed) return;
+        const newGrid = getGridWithWall(this.state.grid, row, col);
+        this.setState({grid: newGrid});
+    }
+    
+    handleMouseUp() {
+        this.setState({mouseIsPressed: false});
+    }
+    
     animateDijkstra(visitedNodes, nodesInShortestPath) {
         for (let i = 0; i <= visitedNodes.length; i++) {
           if (i === visitedNodes.length) {
@@ -58,7 +74,7 @@ export class PathfindingVisualizer extends Component {
     }
     
     render() {
-        const {grid} = this.state;
+        const {grid, mouseIsPressed} = this.state;
         return (
             <>
             <button onClick={() => this.visualizeDijkstra()}>
@@ -69,14 +85,19 @@ export class PathfindingVisualizer extends Component {
                     return (
                     <div key={rowIdx}>
                         {row.map((node, nodeIdx) => {
-                            const {col, row, isFinish, isStart} = node;
+                            const {col, row, isFinish, isStart, isWall} = node;
                             return (
                                 <Node
                                 key = {nodeIdx}
                                 col = {col}
                                 row = {row}
                                 isFinish = {isFinish}
-                                isStart = {isStart}></Node>
+                                isStart = {isStart}
+                                isWall={isWall}
+                                mouseIsPressed={mouseIsPressed}
+                                onMouseDown={(row, col) => this.handleMouseDown(row, col)}
+                                onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
+                                onMouseUp={() => this.handleMouseUp()}></Node>
                             );
                         })}
                         </div>
@@ -104,8 +125,9 @@ const createNode = (row,col) => {
     return {
         col,
         row,
-        isStart: row === 7 && col === 7,
-        isFinish: row === 12 && col === 39,
+        isStart: row === START_NODE_ROW && col === START_NODE_COL,
+        isFinish: row === END_NODE_ROW && col === END_NODE_COL,
+        isWall: false,
     };
 };
 
@@ -144,5 +166,18 @@ function makeEdges(grid) {
     return edges;
 }
 
+const getGridWithWall = (grid, row, col) => {
+    const newGrid = grid.slice();
+    const node = newGrid[row][col];
+    const newNode = {
+      ...node,
+      isWall: !node.isWall,
+    };
+    newGrid[row][col] = newNode;
+    return newGrid;
+};
+  
 
 export default PathfindingVisualizer
+
+

@@ -5,11 +5,11 @@
     display: inline-block;
 }
 .node-finish {
-background-color: red;
+    background-color: red;
 }
 
 .node-start {
-background-color: green;
+    background-color: green;
 }
 
 .node-visited {
@@ -72,3 +72,8 @@ background-color: green;
         background-color: rgb(255, 254, 106);
     }
 }
+
+.node-wall {
+    background-color: rgb(12, 53, 71);
+}
+  

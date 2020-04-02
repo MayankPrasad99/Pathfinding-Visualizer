@@ -12,13 +12,20 @@ export class Node extends Component {
             row,
             isFinish,
             isStart,
+            isWall,
+            onMouseDown,
+            onMouseEnter,
+            onMouseUp,
         } = this.props;
-        const NodeClassName = isFinish ? 'node-finish' : isStart ? 'node-start' : '';
+        const NodeClassName = isFinish ? 'node-finish' : isStart ? 'node-start' : isWall ? 'node-wall' : '';
 
         return(
             <div 
             id={`node-${row}-${col}`}
-            className={`node ${NodeClassName}`}></div>
+            className={`node ${NodeClassName}`}
+            onMouseDown={() => onMouseDown(row, col)}
+            onMouseEnter={() => onMouseEnter(row, col)}
+            onMouseUp={() => onMouseUp()}></div>
         )
     }
 }
