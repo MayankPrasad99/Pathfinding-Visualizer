@@ -1,8 +1,9 @@
-export function dijkstra(grid, startNode, endNode, edges){
+export function aStar(grid, startNode, endNode, edges){
     const nodes = [];
     for (const row of grid) {
         for (const node of row) {
             node.distance = Infinity;
+            node.manhattanDist = Math.abs(endNode.row - node.row) + Math.abs(endNode.col - node.col); 
             node.visited = false;
             node.previousNode = startNode;
             nodes.push(node);
@@ -51,11 +52,17 @@ function getMin(nodes){
     let minIdx = -1;
     let i = 0;
     for(const node of nodes){
-        if(!node.visited && !node.isWall && (minNode === undefined || minNode.distance > node.distance)){
+        if(!node.visited && !node.isWall && (minNode === undefined || minNode.distance + minNode.manhattanDist > node.distance + node.manhattanDist)){
             minNode = node;
             minIdx = i;
+        }else if(!node.visited && !node.isWall && minNode.distance + minNode.manhattanDist === node.distance + node.manhattanDist) {
+            if(minNode.manhattanDist > node.manhattanDist) {
+                minNode = node;
+                minIdx = i;
+            }
         }
         i++;
     }
+    console.log(minNode.row,minNode.col,minNode.distance + minNode.manhattanDist);
     return [minNode,minIdx];
 }

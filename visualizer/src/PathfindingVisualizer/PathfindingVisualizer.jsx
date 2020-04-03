@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import Node from './Node/Node'
 import './PathfindingVisualizer.css'
 import {dijkstra,getShortestPathNodes} from '../Algorithms/Dijkstra'
+import {aStar} from '../Algorithms/aStar'
 
 const START_NODE_ROW = 7;
 const START_NODE_COL = 7;
-const END_NODE_ROW = 12;
+const END_NODE_ROW = 7;
 const END_NODE_COL = 39;
 
 export class PathfindingVisualizer extends Component {
@@ -37,7 +38,7 @@ export class PathfindingVisualizer extends Component {
         this.setState({mouseIsPressed: false});
     }
     
-    animateDijkstra(visitedNodes, nodesInShortestPath) {
+    animateVisitedNodes(visitedNodes, nodesInShortestPath) {
         for (let i = 0; i <= visitedNodes.length; i++) {
           if (i === visitedNodes.length) {
             setTimeout(() => {
@@ -70,15 +71,27 @@ export class PathfindingVisualizer extends Component {
         const edges = makeEdges(grid);
         const visitedNodes = dijkstra(grid, startNode, endNode, edges);
         const nodesInShortestPath = getShortestPathNodes(startNode,endNode);
-        this.animateDijkstra(visitedNodes, nodesInShortestPath);
+        this.animateVisitedNodes(visitedNodes, nodesInShortestPath);
     }
     
+    visualizeaStar(){
+        const {grid} = this.state;
+        const startNode = grid[START_NODE_ROW][START_NODE_COL];
+        const endNode = grid[END_NODE_ROW][END_NODE_COL];
+        const edges = makeEdges(grid);
+        const visitedNodes = aStar(grid,startNode,endNode,edges);
+        const nodesInShortestPath = getShortestPathNodes(startNode,endNode);
+        this.animateVisitedNodes(visitedNodes, nodesInShortestPath);
+    }
     render() {
         const {grid, mouseIsPressed} = this.state;
         return (
             <>
             <button onClick={() => this.visualizeDijkstra()}>
                 Visualize Dijkstra's Algorithm
+            </button>
+            <button onClick={() => this.visualizeaStar()}>
+                Visualize A* Algorithm
             </button>
             <div className="grid">
                 {grid.map((row, rowIdx) => {
