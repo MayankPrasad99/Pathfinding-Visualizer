@@ -104,7 +104,7 @@ export class PathfindingVisualizer extends Component {
         }
     }
     render() {
-        const {grid, mouseIsPressed} = this.state;
+        const {grid, mouseIsPressed} = this.state;    
         return (
             <>
             <Navbar></Navbar>
@@ -141,7 +141,7 @@ export class PathfindingVisualizer extends Component {
                 })}              
             </div>
             </>
-        );       
+        ); 
     }
 }
 

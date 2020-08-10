@@ -41,7 +41,7 @@ export class GetInput extends Component {
                 <TextField id="standard-basic" label="Staring Position (Y)" onChange={(e) => this.startYchange(e.target.value)} />
                 <TextField id="standard-basic" label="Final Position (X)" onChange={(e) => this.endXchange(e.target.value)} />
                 <TextField id="standard-basic" label="Final Position (Y)" onChange={(e) => this.endYchange(e.target.value)} />
-                <button type="button" onClick={this.handleChange}>Change</button>
+                <button className="button button1" type="button" onClick={this.handleChange}>Change</button>
             </form>
         )
         
