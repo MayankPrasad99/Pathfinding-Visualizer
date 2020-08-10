@@ -2,24 +2,26 @@ import React, { Component } from 'react'
 import Node from './Node/Node'
 import './PathfindingVisualizer.css'
 import {dijkstra,getShortestPathNodes} from '../Algorithms/Dijkstra'
-import {aStar} from '../Algorithms/aStar'
-
-const START_NODE_ROW = 7;
-const START_NODE_COL = 7;
-const END_NODE_ROW = 7;
-const END_NODE_COL = 39;
+import Navbar from '../Navbar/Navbar'
+import GetInput from '../Input/Input'
 
 export class PathfindingVisualizer extends Component {
     constructor(props) {
         super(props);
+        this.handleChange = this.handleChange.bind(this);
         this.state = {
             grid: [],
             mouseIsPressed: false,
+            START_NODE_ROW: 3,
+            START_NODE_COL: 7,
+            END_NODE_COL: 39,
+            END_NODE_ROW: 15,
+
         };
     }
 
     componentDidMount() {
-        const grid = createGrid();
+        const grid = createGrid(this.state.START_NODE_COL, this.state.START_NODE_ROW, this.state.END_NODE_COL, this.state.END_NODE_ROW);
         this.setState({grid});
     }
 
@@ -63,36 +65,57 @@ export class PathfindingVisualizer extends Component {
             }, 50 * i);
         }
     }
-    
     visualizeDijkstra() {
         const {grid} = this.state;
-        const startNode = grid[START_NODE_ROW][START_NODE_COL];
-        const endNode = grid[END_NODE_ROW][END_NODE_COL];
+        const startNode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+        const endNode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
         const edges = makeEdges(grid);
         const visitedNodes = dijkstra(grid, startNode, endNode, edges);
         const nodesInShortestPath = getShortestPathNodes(startNode,endNode);
-        this.animateVisitedNodes(visitedNodes, nodesInShortestPath);
+        const n = nodesInShortestPath.length;
+        const m = visitedNodes.length;
+        this.animateVisitedNodes(visitedNodes.slice(1,m-1), nodesInShortestPath.slice(1,n-1));
     }
     
-    visualizeaStar(){
+    resetGrid() {
+        const newGrid = createGrid(this.state.START_NODE_COL, this.state.START_NODE_ROW, this.state.END_NODE_COL, this.state.END_NODE_ROW);
+        this.setState({grid: newGrid});
+        const nodes = [];
         const {grid} = this.state;
-        const startNode = grid[START_NODE_ROW][START_NODE_COL];
-        const endNode = grid[END_NODE_ROW][END_NODE_COL];
-        const edges = makeEdges(grid);
-        const visitedNodes = aStar(grid,startNode,endNode,edges);
-        const nodesInShortestPath = getShortestPathNodes(startNode,endNode);
-        this.animateVisitedNodes(visitedNodes, nodesInShortestPath);
+        for (const row of grid) {
+            for (const node of row) {
+                nodes.push(node);
+            }
+        }
+        for(let i = 0;i < nodes.length;i++) {
+            const node = nodes[i];
+            const {col, row, isFinish, isStart} = node;
+            const NodeClassName = isFinish ? 'node-finish' : isStart ? 'node-start' : '';
+            document.getElementById(`node-${row}-${col}`).className = `node ${NodeClassName}`;
+        }
+    }
+    handleChange(stX, stY, endX, endY) {
+        if(parseInt(stX) < 0 || parseInt(stX) >= 20 || parseInt(stY) < 0 || parseInt(stY) >= 50 || parseInt(endX) < 0 || parseInt(endX) >= 20 || parseInt(endY) < 0 || parseInt(endY) >= 50) {
+            alert("Values entered dont fit in the Grid!!");
+        }else {
+            this.setState({START_NODE_ROW: parseInt(stX), START_NODE_COL: parseInt(stY), END_NODE_ROW: parseInt(endX), END_NODE_COL: parseInt(endY)}, () => {
+                this.resetGrid();
+            });
+        }
     }
     render() {
         const {grid, mouseIsPressed} = this.state;
         return (
             <>
-            <button onClick={() => this.visualizeDijkstra()}>
+            <Navbar></Navbar>
+            <button className="button button1" onClick={() => this.visualizeDijkstra()}>
                 Visualize Dijkstra's Algorithm
             </button>
-            <button onClick={() => this.visualizeaStar()}>
-                Visualize A* Algorithm
+            <button className="button button1" onClick={() => this.resetGrid()}>
+                Reset Grid
             </button>
+            <GetInput handleChange = {this.handleChange} stX = {this.state.START_NODE_ROW} stY = {this.state.START_NODE_COL}
+                        endX = {this.state.END_NODE_ROW} endY = {this.state.END_NODE_COL}></GetInput>
             <div className="grid">
                 {grid.map((row, rowIdx) => {
                     return (
@@ -122,24 +145,25 @@ export class PathfindingVisualizer extends Component {
     }
 }
 
-const createGrid = () => {
+const createGrid = (startc, startr, endc, endr) => {
     const grid = [];
     for(let row = 0; row < 20; row++){
         const currentRow = [];
         for(let col = 0; col < 50; col++){
-            currentRow.push(createNode(row,col));
+            currentRow.push(createNode(row,col,startr,startc,endr,endc));
+            console.log(row,col,startr,startc,endr,endc);
         }
         grid.push(currentRow);
     }
     return grid;
 };
 
-const createNode = (row,col) => {
+const createNode = (row,col,startr,startc,endr,endc) => {
     return {
         col,
         row,
-        isStart: row === START_NODE_ROW && col === START_NODE_COL,
-        isFinish: row === END_NODE_ROW && col === END_NODE_COL,
+        isStart: row === startr && col === startc,
+        isFinish: row === endr && col === endc,
         isWall: false,
     };
 };

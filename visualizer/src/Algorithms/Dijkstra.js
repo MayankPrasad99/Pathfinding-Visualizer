@@ -13,6 +13,7 @@ export function dijkstra(grid, startNode, endNode, edges){
     for(let k = 0;k < nodes.length ;k++){
         const [minNode,minIdx] = getMin(nodes);
         if(minNode.distance === Infinity){
+            alert("NO Path Possible!");
             return visitedNodesInOrder;
         }
         minNode.visited= true;
